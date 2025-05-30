@@ -1,0 +1,1 @@
+ npx @tailwindcss/cli -i ./resources/css/app.css -o ./public/css/app.css --watch --content "./resources/**/*.{php,js,ts}"

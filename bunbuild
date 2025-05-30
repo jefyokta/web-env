@@ -1,0 +1,1 @@
+bun build resources/js/app.ts --outfile=public/
