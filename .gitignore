@@ -26,4 +26,4 @@ node_modules/
 public/build/
 hot
 composer.lock
-package-log.json
+package-lock.json
