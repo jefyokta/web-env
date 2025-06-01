@@ -1,0 +1,31 @@
+#!/usr/bin/env php
+<?php
+
+use Swoole\Coroutine;
+use Swoole\Coroutine\Http\Client;
+use function Swoole\Coroutine\run;
+
+define('ganteng', true);
+define("jepi", ganteng);
+run(function () {
+    $client =  new Client("127.0.0.1", 8000);
+    $res = $client->upgrade("/?token=rahasia");
+    if ($res) {
+        while (jepi == ganteng) {
+            if (!$client->connected) {
+                break;
+            }
+            $data =  [
+                "event" => "publish",
+                "message" => [
+                    "lux" => rand(100, 500),
+                    "crisp" => rand(50, 100),
+                    "temperature" => rand(20, 30),
+                    "dust" => rand(100, 300)
+                ]
+            ];
+            $client->push(json_encode($data));
+            Coroutine::sleep(2);
+        }
+    }
+});

@@ -1,108 +1,112 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { CartesianGrid, Line, LineChart, XAxis } from "recharts"
 import { TrendingUp } from "lucide-react"
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts"
+
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/Components/ui/card"
 import {
+  ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
 } from "@/Components/ui/chart"
+import React from "react"
+import { SensorChartProps } from "@/types"
 
-export type RealtimeSensorChartProps = {
-  title: string
-  description?: string
-  sensorKey: string
-  label: string
-  colorVar?: string // default ke --chart-1
-  generateData: () => number
-  intervalMs?: number
-  maxDataPoints?: number
+export const description = "An area chart with gradient fill"
+
+
+interface RealtimeSensorChartProps extends SensorChartProps {
+  desc?: string,
+  reponsiveClass?: string,
+  label?: string,
+  dataKey?: string
 }
+export const RealTimeChart: React.FC<RealtimeSensorChartProps> = ({ title, desc, className, reponsiveClass, data, label, dataKey }) => {
 
-export function RealtimeSensorChart({
-  title,
-  description = "Data realtime",
-  sensorKey,
-  label,
-  colorVar = "hsl(var(--chart-1))",
-  generateData,
-  intervalMs = 2000,
-  maxDataPoints = 20,
-}: RealtimeSensorChartProps) {
-  const [data, setData] = useState<Record<string, any>[]>([])
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const now = new Date()
-      const time = now.toLocaleTimeString()
-      const value = generateData()
-
-      setData((prev) => [
-        ...prev.slice(-maxDataPoints + 1),
-        { time, [sensorKey]: value },
-      ])
-    }, intervalMs)
-
-    return () => clearInterval(interval)
-  }, [sensorKey, generateData, intervalMs, maxDataPoints])
 
   const chartConfig = {
-    [sensorKey]: {
-      label,
-      color: colorVar,
+    mobile: {
+      label: label || "stuff",
+      color: "var(--chart-2)",
     },
-  }
-
+  } satisfies ChartConfig
   return (
-    <Card>
+    <Card className={`bg-neutral-100/20 ${className}   border-0`}>
       <CardHeader>
-        <CardTitle>{title}</CardTitle>
-        <CardDescription>{description}</CardDescription>
+        <CardTitle className="text-white">{title}</CardTitle>
+        <CardDescription className="text-zinc-300">
+          {desc}
+        </CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig}>
-          <LineChart
+        <ChartContainer config={chartConfig} reponsiveClass={reponsiveClass} >
+          <AreaChart
+            accessibilityLayer
             data={data}
-            margin={{ left: 12, right: 12 }}
+            margin={{
+              left: 0,
+              right: 12,
+            }}
           >
             <CartesianGrid vertical={false} />
+            <YAxis className="text-slate-100" />
             <XAxis
-              dataKey="time"
+              dataKey={"time"}
+              color="white"
+              tick={{ fill: "white" }}
               tickLine={false}
               axisLine={false}
               tickMargin={8}
+              tickFormatter={(value) => value}
+              stroke="white"
+              className="text-xs"
             />
-            <ChartTooltip
-              cursor={false}
-              content={<ChartTooltipContent hideLabel />}
+            <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+            <defs>
+              <linearGradient id="fillDesktop" x1="0" y1="0" x2="0" y2="1">
+                <stop
+                  offset="5%"
+                  stopColor="var(--color-desktop)"
+                  stopOpacity={0.8}
+                />
+                <stop
+                  offset="95%"
+                  stopColor="var(--color-desktop)"
+                  stopOpacity={0.1}
+                />
+              </linearGradient>
+              <linearGradient id="fillMobile" x1="0" y1="0" x2="0" y2="1">
+                <stop
+                  offset="5%"
+                  stopColor="var(--color-mobile)"
+                  stopOpacity={0.8}
+                />
+                <stop
+                  offset="95%"
+                  stopColor="var(--color-mobile)"
+                  stopOpacity={0.1}
+                />
+              </linearGradient>
+            </defs>
+            <Area
+              dataKey={dataKey || "value"}
+              type="natural"
+              fill="url(#fillMobile)"
+              fillOpacity={0.4}
+              stroke="var(--color-mobile)"
+              stackId="a"
             />
-            <Line
-              dataKey={sensorKey}
-              type="monotone"
-              stroke={`var(--color-${sensorKey})`}
-              strokeWidth={2}
-              dot={false}
-            />
-          </LineChart>
+
+          </AreaChart>
         </ChartContainer>
       </CardContent>
-      <CardFooter className="flex-col items-start gap-2 text-sm">
-        <div className="flex gap-2 font-medium leading-none">
-          Data diperbarui setiap {intervalMs / 1000}s <TrendingUp className="h-4 w-4" />
-        </div>
-        <div className="leading-none text-muted-foreground">
-          Menampilkan {maxDataPoints} data terakhir
-        </div>
-      </CardFooter>
     </Card>
   )
 }

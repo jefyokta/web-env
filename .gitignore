@@ -23,4 +23,7 @@ node_modules/
 *.njsproj
 *.sln
 *.sw?
-public/*
+public/build/
+hot
+composer.lock
+package-log.json

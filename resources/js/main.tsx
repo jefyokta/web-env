@@ -1,6 +1,6 @@
 /// <reference types="vite/client" />
 
-import '@vite/client'
+// import '@vite/client'
 import "./../css/app.css"
 import { createRoot } from 'react-dom/client'
 import { createInertiaApp } from '@inertiajs/react'

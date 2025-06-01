@@ -20,7 +20,7 @@ type ChartContextProps = {
   config: ChartConfig
 }
 
-const ChartContext = React.createContext<ChartContextProps | null>(null)
+export const ChartContext = React.createContext<ChartContextProps | null>(null)
 
 function useChart() {
   const context = React.useContext(ChartContext)
@@ -37,12 +37,14 @@ function ChartContainer({
   className,
   children,
   config,
+  reponsiveClass,
   ...props
 }: React.ComponentProps<"div"> & {
   config: ChartConfig
   children: React.ComponentProps<
     typeof RechartsPrimitive.ResponsiveContainer
-  >["children"]
+  >["children"],
+  reponsiveClass?: string
 }) {
   const uniqueId = React.useId()
   const chartId = `chart-${id || uniqueId.replace(/:/g, "")}`
@@ -59,9 +61,12 @@ function ChartContainer({
         {...props}
       >
         <ChartStyle id={chartId} config={config} />
-        <RechartsPrimitive.ResponsiveContainer>
-          {children}
-        </RechartsPrimitive.ResponsiveContainer>
+        <div className={`w-full ${reponsiveClass}`} >
+
+          <RechartsPrimitive.ResponsiveContainer height={"100%"} >
+            {children}
+          </RechartsPrimitive.ResponsiveContainer>
+        </div>
       </div>
     </ChartContext.Provider>
   )
@@ -84,13 +89,13 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
             ([theme, prefix]) => `
 ${prefix} [data-chart=${id}] {
 ${colorConfig
-  .map(([key, itemConfig]) => {
-    const color =
-      itemConfig.theme?.[theme as keyof typeof itemConfig.theme] ||
-      itemConfig.color
-    return color ? `  --color-${key}: ${color};` : null
-  })
-  .join("\n")}
+                .map(([key, itemConfig]) => {
+                  const color =
+                    itemConfig.theme?.[theme as keyof typeof itemConfig.theme] ||
+                    itemConfig.color
+                  return color ? `  --color-${key}: ${color};` : null
+                })
+                .join("\n")}
 }
 `
           )
@@ -314,8 +319,8 @@ function getPayloadConfigFromPayload(
 
   const payloadPayload =
     "payload" in payload &&
-    typeof payload.payload === "object" &&
-    payload.payload !== null
+      typeof payload.payload === "object" &&
+      payload.payload !== null
       ? payload.payload
       : undefined
 

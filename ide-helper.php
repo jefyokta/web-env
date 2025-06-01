@@ -3,7 +3,7 @@ class FFI
 {
 
     function watchDir(string $dir) {}
-    function waitForChanges(int $ms){}
+    function waitForChanges(int $ms):int{ return 0;}
 }
 
 namespace Swoole;

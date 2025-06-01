@@ -3,33 +3,30 @@
 use Swoole\Http\Server;
 use Swoole\ConnectionPool;
 use Swoole\Runtime;
-
-Runtime::enableCoroutine(); // Enable coroutine hook untuk PDO
+use Swoole\Database\PDOConfig;
+use Swoole\Database\PDOPool;
+Runtime::enableCoroutine();
 
 $server = new Server("127.0.0.1", 9501);
 
+$server->set([
+    "task_worker_num" => 2,
+    "task_enable_coroutine" => true
+]);
 
-// Pool global per worker
-$pool = new ConnectionPool(function () {
-    return new PDO(
-        "mysql:host=127.0.0.1;dbname=test;charset=utf8mb4",
-        "root",
-        "", 
-        [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        ]
-    );
-}, 5); // Max 5 koneksi per worker
 
 $server->on("WorkerStart", function () use ($pool) {
-    $pool->fill(); // Isi pool saat worker start
+    $pool->fill();
     echo "Connection pool filled.\n";
 });
 
-$server->on("Request", function ($req, $res) use ($pool) {
-    go(function () use ($res, $pool) {
-        $pdo = $pool->get(); // Ambil koneksi dari pool
+$server->on("Request", function ($req, $res) use ($pool, $server) {
+    go(function () use ($res, $pool, $server) {
+        $pdo = $pool->get();
+
+        $server->task(["id" => 1, "handler" => function () {
+            echo "task 1 handler";
+        }]);
 
         if (!$pdo) {
             $res->status(500);
@@ -47,13 +44,21 @@ $server->on("Request", function ($req, $res) use ($pool) {
             $res->status(500);
             $res->end("DB Error: " . $e->getMessage());
         } finally {
-            $pool->put($pdo); 
+            $pool->put($pdo);
         }
     });
 });
 
+$server->on("Task", function ($server, $task) {
+    $task->data["handler"]();
+    $task->finish("");
+});
+$server->on("Finish", function () {
+    echo "finish";
+});
+
 $server->on("WorkerExit", function () use ($pool) {
-    $pool->close(); 
+    $pool->close();
     echo "Connection pool closed.\n";
 });
 

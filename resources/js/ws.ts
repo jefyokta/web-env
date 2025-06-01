@@ -1,13 +1,13 @@
+export type SensorMessage = {
+  temperature: number;
+  dust: number;
+  lux: number;
+  crisp: number;
+};
 
-export type Message = {
+export type Message<T = SensorMessage> = {
     event : string;
-    message: any
+    message: T
 
 }
 
-export const buildMessage = (msg:string,event:string):Message=>{
-    return {
-        event:event,
-        message:msg,
-    }
-}

@@ -1,9 +1,4 @@
-type SensorMessage = {
-  temperature: number;
-  dust: number;
-  lux: number;
-  crisp: number;
-};
+import { SensorMessage } from "./ws";
 
 type EventPayloads = {
   sensor: SensorMessage;

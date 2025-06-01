@@ -1,13 +1,14 @@
+#!/usr/bin/env php
 <?php
 
 declare(ticks=1);
 
+require_once __DIR__ . "/vendor/autoload.php";
 
 $config = require __DIR__ . "/config/app.php";
 
 function startServer($config)
 {
-    require_once __DIR__ . "/vendor/autoload.php";
     /**
      * @var \Oktaax\Oktaax
      */
@@ -17,10 +18,12 @@ function startServer($config)
     });
 }
 
+
+
+
 if ($config['app']['dev']) {
     $watcher = FFI::cdef(file_get_contents(__DIR__ . "/c/fileWatcher.h"), __DIR__ . "/libfileWatcher.so");
     $watcher->watchDir(__DIR__ . "/app/");
-
     $pidServer = pcntl_fork();
 
     if ($pidServer == -1) {
@@ -32,7 +35,7 @@ if ($config['app']['dev']) {
         while (true) {
             $changed = $watcher->waitForChanges(1000);
             if ($changed > 0) {
-                echo "File changed, restarting server...\n";
+                echo "\033[33mFile changed, restarting server...\033[0m\n";
                 posix_kill($pidServer, SIGTERM);
                 pcntl_waitpid($pidServer, $status);
 

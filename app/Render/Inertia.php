@@ -18,25 +18,25 @@ class Inertia
      * 
      * @return void
      */
-    public static function render(Request $request, Response $response, array $data)
+    public static function render($component, array $data = [])
     {
-        $component = $data['component'] ?? null;
+        $request = Request::getInstance();
+        $response =  Response::getInstance();
         $props = $data['props'] ?? [];
-
         if (!$component) {
             throw new \InvalidArgumentException("Inertia render requires 'component' key");
         }
 
-        $isInertia = !empty($request->header['x-inertia'] ?? null);
 
+        $isInertia = !empty($request->header['x-inertia'] ?? null);
         if ($isInertia) {
             $response->header('Content-Type', 'application/json');
-            $response->header('X-Inertia',true);
+            $response->header('X-Inertia', true);
             $payload = [
                 'component' => $component,
                 'props' => $props,
                 'url' => $request->server['request_uri'],
-                'version' => null 
+                'version' => null
             ];
             $response->end(json_encode($payload));
         } else {

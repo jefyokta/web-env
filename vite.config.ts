@@ -1,29 +1,36 @@
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
 import tailwindcss from '@tailwindcss/vite'
-// import tailwindcss from '@tailwindcss/vite'
+import { HotPlugin } from './vite.plugin'
 
-export default defineConfig({
-  plugins: [react(),tailwindcss()],
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd())
 
-  
-  build: {
-    manifest: true, 
-    outDir: 'public/build', 
-    rollupOptions: {
-      input: 'resources/js/main.tsx',
-    }
-  },
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, 'resources/js'),
-    }
-  },
-    server: {
-    watch: {
-      usePolling: true,  
+  return {
+    plugins: [react(), tailwindcss(), HotPlugin()],
+
+    build: {
+      manifest: true,
+      outDir: 'public/build',
+      rollupOptions: {
+        input: 'resources/js/main.tsx',
+      },
     },
-    hmr: true,
-  },
+    resolve: {
+      alias: {
+        '@': path.resolve(__dirname, 'resources/js'),
+      },
+    },
+    server: {
+      host: env.VITE_HOST || 'localhost',
+      watch: {
+        usePolling: true,
+      },
+      cors:{
+        origin:"*"
+      },
+      hmr: true,
+    },
+  }
 })
