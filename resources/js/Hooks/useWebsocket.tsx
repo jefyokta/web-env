@@ -1,4 +1,4 @@
-import { WebSocketContext } from "@/Context/Websocket";
+import { WebSocketContext } from "@/Context/WebsocketContext";
 import { useContext } from "react";
 
 

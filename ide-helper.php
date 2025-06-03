@@ -3,7 +3,10 @@ class FFI
 {
 
     function watchDir(string $dir) {}
-    function waitForChanges(int $ms):int{ return 0;}
+    function waitForChanges(int $ms): int
+    {
+        return 0;
+    }
 }
 
 namespace Swoole;
@@ -46,4 +49,13 @@ class ConnectionPool
      * @return void
      */
     public function close(): void {}
+}
+
+namespace Swoole\Coroutine;
+
+class WaitGroup
+{
+    function add() {}
+    function done() {}
+    function wait() {}
 }

@@ -10,11 +10,12 @@ import { useWebsocket } from "@/Hooks/useWebsocket"
 import { useEffect, useState } from "react"
 import { DataPoint } from "@/types"
 import { generateData } from "./Charts"
+import { getStatus } from "@/lib/utils"
 
 
 const Index = () => {
 
-    return <Application title="RealTime Data">
+    return <Application title="RealTime Datas">
         <RealTimeDashboard />
 
 
@@ -55,8 +56,8 @@ const RealTimeDashboard = () => {
                     value={crisp}
                     unit="%"
                     valueClassName="text-white"
-                    status="Normal"
-                    statusColor="bg-green-500"
+                    status={getStatus.crisp(crisp).desc}
+                    statusColor={getStatus.crisp(crisp).color}
                 />
 
             </div>
@@ -67,8 +68,8 @@ const RealTimeDashboard = () => {
                 value={temp}
                 unit="°C"
                 valueClassName="text-red-800"
-                status="Panas"
-                statusColor="bg-red-500"
+                status={getStatus.temp(temp).desc}
+                statusColor={getStatus.temp(temp).color}
             />
 
             <Card
@@ -77,8 +78,8 @@ const RealTimeDashboard = () => {
                 value={dust}
                 unit="µg/m³"
                 valueClassName="text-yellow-400"
-                status="Sedang"
-                statusColor="bg-yellow-400"
+                status={getStatus.dust(dust).desc}
+                statusColor={getStatus.dust(dust).color}
             />
 
             <Card
@@ -87,8 +88,8 @@ const RealTimeDashboard = () => {
                 value={lux}
                 unit="lux"
                 valueClassName="text-green-400"
-                status="Normal"
-                statusColor="bg-green-500"
+                status={getStatus.lux(lux).desc}
+                statusColor={getStatus.lux(lux).color}
             />
         </div>
     </div>

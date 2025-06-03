@@ -7,14 +7,14 @@ use Oktaax\Http\Response;
 
 class Inertia
 {
+
+    private static string $baseView = "app";
     /**
      * Render Inertia response
      * 
-     * @param Request $request
-     * @param Response $response
-     * @param array $data Associative array with keys:
-     *                    - component: string component name
-     *                    - props: array of props for component
+     * @param string $component
+  
+     * @param array $data 
      * 
      * @return void
      */
@@ -22,14 +22,12 @@ class Inertia
     {
         $request = Request::getInstance();
         $response =  Response::getInstance();
-        $props = $data['props'] ?? [];
+        $props = $data;
         if (!$component) {
             throw new \InvalidArgumentException("Inertia render requires 'component' key");
         }
 
-
-        $isInertia = !empty($request->header['x-inertia'] ?? null);
-        if ($isInertia) {
+        if ($request->isInertia()) {
             $response->header('Content-Type', 'application/json');
             $response->header('X-Inertia', true);
             $payload = [
@@ -46,7 +44,13 @@ class Inertia
                 'url' => $request->server['request_uri'],
                 'version' => null
             ]);
-            $response->render('app', ['page' => $page]);
+            $response->render(self::$baseView, ['page' => $page]);
         }
+    }
+
+
+    static function setBaseView(string $baseView){
+        self::$baseView = $baseView;
+
     }
 }

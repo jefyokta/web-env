@@ -18,7 +18,8 @@ export const Slave = () => {
                         description: "ESP32 is now providing sensor data.",
                         icon: <CheckCircle className="text-green-500" />,
                     })
-                } else {
+                } 
+                else {
                     toast.error("ESP32 Disconnected", {
                         description: "ESP32 has stopped sending sensor data.",
                         icon: <XCircle className="text-red-500" />,
@@ -26,7 +27,11 @@ export const Slave = () => {
                 }
                 setEspConnected((msg as Message<boolean>).message)
 
-            } else {
+            } else if(msg.event == 'esp_status'){
+                setEspConnected(msg.message as boolean)
+            }
+            
+            else {
                 setLastMessage((msg as Message<SensorMessage>))
             }
         }

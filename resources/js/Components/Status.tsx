@@ -11,7 +11,7 @@ export const Status: React.FC = () => {
             <Tooltip>
                 <TooltipTrigger asChild>
                     <div
-                        className={`flex justify-center items-center rounded-3xl p-1 px-1.5 space-x-1 shadow transition-all duration-300 
+                        className={`flex cursor-pointer justify-center items-center rounded-3xl p-1 px-1.5 space-x-1 shadow transition-all duration-300 
                     ${espConnected ? "bg-green-700/70 animate-pulse" : "bg-red-800/30"}`}
                     >
                         <Esp32 className="stroke-zinc-200/70 w-4 h-4 transition-transform duration-300" />
@@ -26,7 +26,7 @@ export const Status: React.FC = () => {
                 <TooltipTrigger asChild>
 
                     <div
-                        className={`flex justify-center items-center rounded-3xl p-1 px-1.5 space-x-1 transition-all duration-300 
+                        className={`flex cursor-pointer justify-center items-center rounded-3xl p-1 px-1.5 space-x-1 transition-all duration-300 
                     ${connected ? "bg-green-700/70 animate-pulse" : "bg-red-800/30"}`}
                     >
                         <WebsocketIcon className="stroke-zinc-200 w-4 h-4 transition-transform duration-300" />

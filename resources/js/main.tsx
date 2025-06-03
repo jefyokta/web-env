@@ -1,9 +1,9 @@
 /// <reference types="vite/client" />
 
-// import '@vite/client'
 import "./../css/app.css"
 import { createRoot } from 'react-dom/client'
 import { createInertiaApp } from '@inertiajs/react'
+// import { WebSocketProvider } from "./Context/WebsocketContext";
 
 
 declare global {
@@ -24,10 +24,26 @@ if (import.meta.hot) {
   })
 }
 
+
+const wshost = window.location.hostname;
+const isSecure = window.location.protocol === "https:";
+const port = window.location.port || (isSecure ? 443 : 80);
+const protocol = isSecure ? "wss" : "ws";
+const url = `${protocol}://${wshost}:${port}`;
 createInertiaApp({
   resolve: name => import(`./Pages/${name}.tsx`),
   setup({ el, App, props }) {
-    createRoot(el).render(<App {...props} />)
+    (async () => {
+      const { WebSocketProvider } = await import("@/Context/WebsocketContext");
+      const { Toaster } = await import("@/Components/ui/sonner");
+
+      createRoot(el).render(
+        <WebSocketProvider url={url}>
+          <App {...props} />
+          <Toaster />
+        </WebSocketProvider>
+      );
+    })();
   },
 })
 

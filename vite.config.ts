@@ -14,7 +14,7 @@ export default defineConfig(({ mode }) => {
       manifest: true,
       outDir: 'public/build',
       rollupOptions: {
-        input: 'resources/js/main.tsx',
+        input: ['resources/js/main.tsx'],
       },
     },
     resolve: {

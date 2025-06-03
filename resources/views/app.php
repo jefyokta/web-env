@@ -44,7 +44,9 @@ if (file_exists($hotFile)) {
     <div id="app" data-page='<?= $page ?>'></div>
 
     <?php if ($viteDevServer): ?>
+        <!-- <script type="module" src="<?= htmlspecialchars($viteDevServer) ?>/resources/js/ws.ts"></script> -->
         <script type="module" src="<?= htmlspecialchars($viteDevServer) ?>/resources/js/main.tsx"></script>
+
     <?php else: ?>
         <script type="module" src="/build/<?= htmlspecialchars($entry['file']) ?>"></script>
     <?php endif; ?>

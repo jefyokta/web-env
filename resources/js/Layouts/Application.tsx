@@ -6,11 +6,11 @@ import { WebsocketIcon } from "@/Components/Icon/Websocket"
 import { Status } from "@/Components/Status"
 import { FloatingDock } from "@/Components/ui/floating-dock"
 import { Toaster } from "@/Components/ui/sonner"
-import { WebSocketContext, WebSocketProvider } from "@/Context/Websocket"
+import { WebSocketContext, WebSocketProvider } from "@/Context/WebsocketContext"
 import { Slave } from "@/Hooks/wsSlave"
 import { Message } from "@/ws"
 import { Link } from "@inertiajs/react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 type ApplicationProps = {
     title?: string
@@ -33,8 +33,14 @@ const Application: React.FC<ApplicationProps> = ({ children, title }) => {
 
     const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
     const date = new Date;
-    const [time, setTime] = useState(date.getHours() + "." + date.getMinutes())
+    const [time, setTime] = useState(new Date)
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setTime(new Date())
+        }, 1000)
 
+        return () => clearInterval(interval)
+    }, [])
     const Links = [
         {
             title: "Realtime",
@@ -54,7 +60,7 @@ const Application: React.FC<ApplicationProps> = ({ children, title }) => {
     ]
 
     return (
-        <WebSocketProvider url={url}>
+        <>
             <div className="h-screen w-full bg-radial-[at_40%_70%] from-orange-900 via-40% relative  via-slate-900 to-neutral-900 to-70% flex flex-col backdrop-blur p-2 md:p-5">
                 <div className="flex bg-zinc-100/10   rounded-3xl backdrop-blur flex-1 overflow-hidden p-3 gap-2.5">
                     <aside className="hidden md:flex  bg-zinc-900 backdrop-blur-md shadow-xl rounded-3xl p-6 pr-16 flex flex-col">
@@ -79,13 +85,13 @@ const Application: React.FC<ApplicationProps> = ({ children, title }) => {
                                 </svg>
                                 <span>{days[date.getDay()]}, {date.getDate()} {monthNames[date.getMonth()]} {date.getFullYear()}</span>
                             </div>
-                            <div className="flex items-center justify-center text-sm bg-zinc-100 text-gray-900 p-1 rounded-3xl px-4 font-normal space-x-2">
+                            <div className="flex items-center justify-center text-sm bg-zinc-100 text-gray-900 p-1 rounded-3xl px-2 md:px-4 font-normal space-x-2">
 
-                                <svg fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-900 w-5 h-5" viewBox="0 0 24 24">
+                                <svg fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-900 w-4 h-4 " viewBox="0 0 24 24">
                                     <circle cx="12" cy="12" r="9" />
                                     <path d="M12 8V12L15 15" />
                                 </svg>
-                                <span>12.00</span>
+                                <span className="text-xs">{time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}</span>
                             </div>
                         </div>
 
@@ -94,7 +100,7 @@ const Application: React.FC<ApplicationProps> = ({ children, title }) => {
                                 <h2 className="">
                                     {title || "title"}
                                 </h2>
-                              <Status />
+                                <Status />
                             </div>
                             <div className="flex flex-1 md:px-3  flex-wrap justify-center   rounded-3xl  py-5 w-full gap-6">
                                 {children}
@@ -106,9 +112,10 @@ const Application: React.FC<ApplicationProps> = ({ children, title }) => {
             <div className="fixed bottom-0 md:hidden pb-1  flex justify-center w-full">
                 <FloatingDock items={Links} className="bg-zinc-900 backdrop-blur-md" />
             </div>
-            <Toaster />
+            {/* <Toaster /> */}
             <Slave />
-        </WebSocketProvider>)
+        </>
+    )
 }
 
 export default Application

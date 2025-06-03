@@ -3,22 +3,26 @@
 
 declare(ticks=1);
 
+use App\Service\Scanner;
+
 require_once __DIR__ . "/vendor/autoload.php";
 
 $config = require __DIR__ . "/config/app.php";
 
 function startServer($config)
 {
+    $scanner =  new Scanner;
+    $scanner->find();
     /**
      * @var \Oktaax\Oktaax
      */
+
     $app = require __DIR__ . "/app/ServerProvider.php";
     $app->listen($config['app']['port'], $config['app']['host'], function ($url) {
         echo "Listening at {$url}\n";
     });
+
 }
-
-
 
 
 if ($config['app']['dev']) {
