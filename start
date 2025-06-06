@@ -4,6 +4,9 @@
 declare(ticks=1);
 
 use App\Service\Scanner;
+use Swoole\Coroutine\Http\Client;
+
+use function Swoole\Coroutine\run;
 
 require_once __DIR__ . "/vendor/autoload.php";
 
@@ -19,9 +22,16 @@ function startServer($config)
 
     $app = require __DIR__ . "/app/ServerProvider.php";
     $app->listen($config['app']['port'], $config['app']['host'], function ($url) {
+        $espHost = __DIR__ . "/storage/esp";
+        if (file_exists($espHost)) {
+            run(function () use ($espHost) {
+                $client = new Client(file_get_contents($espHost), 80);
+                $client->post("/server", ["server" => swoole_get_local_ip()]);
+                $client->close();
+            });
+        }
         echo "Listening at {$url}\n";
     });
-
 }
 
 

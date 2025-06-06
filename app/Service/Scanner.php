@@ -21,9 +21,13 @@ class Scanner
             echo "✅ Found (" . count($activeHosts) . ") active host(s):\n";
             foreach ($activeHosts as $ip) {
                 echo " - $ip\n";
+
                 if ($this->isEsp($ip)) {
-                    Coroutine::writeFile(__DIR__."/../../storage/esp", $ip);
+                    echo " <-";
+
+                    Coroutine::writeFile(__DIR__ . "/../../storage/esp", $ip);
                 };
+                echo "\n";
             }
         });
     }
