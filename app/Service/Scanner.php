@@ -92,17 +92,24 @@ class Scanner
     protected function isEsp(string $ip): bool
     {
         $host = $ip;
-        $port = 80;
 
-        $client = new Client($host, $port);
-        $client->set(['timeout' => 5]);
+        $client = new Client($host, 80);
+        $form = http_build_query([
+            "host" => swoole_get_local_ip(),
+            "port" => $_ENV["APP_PORT"]
+        ]);
 
-        $ret = $client->get('/esp');
+        $client->setHeaders([
+            'Content-Type' => 'application/x-www-form-urlencoded',
+            'Content-Length' => strlen($form)
+        ]);
+        $ret =  $client->post("/ws-config", $form);
 
         if ($ret && $client->statusCode === 200) {
             $client->close();
             return true;
         }
+        echo is_scalar($client->getBody()) ? $client->getBody() : json_encode($client->getBody());
 
         $client->close();
         return false;

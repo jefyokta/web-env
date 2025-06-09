@@ -85,14 +85,44 @@ $app->on("Finish", function ($s, $id) {
 
 //ws
 
+$app->on("handshake", function ($request, $response) {
+    $key = $request->header['sec-websocket-key'] ?? '';
+    var_dump($request);
+    // if (!preg_match('#^[+/0-9A-Za-z]{21}[AQgw]==$#', $key) || strlen(base64_decode($key)) !== 16) {
+    //     $response->end();
+    //     return false;
+    // }
+
+    $accept = base64_encode(sha1($key . '258EAFA5-E914-47DA-95CA-C5AB0DC85B11', true));
+    $response->header('Upgrade', 'websocket');
+    $response->header('Connection', 'Upgrade');
+    $response->header('Sec-WebSocket-Accept', $accept);
+    $response->header('Sec-WebSocket-Version', '13');
+    $response->status(101);
+    $response->end();
+    if (isset($request->get['token']) && $request->get['token'] === 'rahasia') {
+        SupportTable::add($request->fd, ['is_esp' => 1]);
+
+        $message = ["event" => "esp_update", "message" => true];
+
+        echo "esp joined with fd: $request->fd\n";
+    };
+
+    return true;
+});
+
 $app->gate(function ($serv, $req) {
     if ($req->queryHas('token') && $req->get['token'] === 'rahasia') {
         SupportTable::add($req->fd, ['is_esp' => 1]);
+
         $message = ["event" => "esp_update", "message" => true];
+
+        echo "esp joined with fd: $req->fd\n";
         $serv
             ->toChannel(Consumer::class)
             ->broadcast(json_encode($message));
     };
+    echo "connectio $req->fd\n";
 });
 
 $app->ws("status", function ($server, $client) {
@@ -104,6 +134,7 @@ $app->ws("publish", function ($server, $client) {
 
     if (SupportTable::find($client->fd)) {
         xserver()->task($client->data);
+        echo "esp_publising";
         $server
             ->toChannel(Consumer::class)
             ->broadcast(json_encode($client->data));
@@ -121,6 +152,7 @@ $app->exit(function ($serv, $fd) {
             }
         }
     }
+    "disconnect $fd";
     SupportTable::remove($fd);
 });
 
@@ -166,7 +198,6 @@ $app->get("/api/history/{page}", function (Request $req, Response $res) use ($po
     } catch (\Throwable $th) {
         $res->status(500)->end(json_encode(['error' => 'Internal Server Error']));
         throw $th;
-        
     } finally {
         $pool->put($pdo);
     }

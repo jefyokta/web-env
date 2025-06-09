@@ -1,6 +1,6 @@
 services:
   app:
-    container_name: app
+    container_name: env_monitor
     build:
       context: .
       dockerfile: Dockerfile
@@ -11,6 +11,7 @@ services:
     env_file:
       - .env
     environment:
+      DB_HOST: mysql
       APP_DEBUG: false
     depends_on:
       - mysql
@@ -26,3 +27,5 @@ services:
       - db_data:/var/lib/mysql
 volumes:
   db_data:
+
+  

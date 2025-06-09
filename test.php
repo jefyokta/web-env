@@ -71,8 +71,20 @@ require_once __DIR__ . "/vendor/autoload.php";
 
 // $server->start();
 
-
-$r = new ReflectionMethod(Oktaax::class, "setApplication");
-foreach ($r->getParameters() as $p) {
-   echo $p->getType();
+function down($x, $a, $b)
+{
+   return $b - $x * ($b - $a);
 }
+
+function up($m, $a, $b)
+{
+   return $m * ($b - $a) + $a;
+}
+
+$decr = down(0.25, 2000, 8000);
+$incr = up(0.6, 2000, 8000);
+
+$num = ($decr * 0.25) + ($incr * 0.6);
+$dem = 0.6 + 0.25;
+
+echo $num / $dem . PHP_EOL;

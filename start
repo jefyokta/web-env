@@ -26,7 +26,7 @@ function startServer($config)
         if (file_exists($espHost)) {
             run(function () use ($espHost) {
                 $client = new Client(file_get_contents($espHost), 80);
-                $client->post("/server", ["server" => swoole_get_local_ip()]);
+                $client->post("/ws-config", ["server" => swoole_get_local_ip()]);
                 $client->close();
             });
         }
