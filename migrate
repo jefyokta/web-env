@@ -5,23 +5,23 @@ require_once __DIR__ . "/vendor/autoload.php";
 $config = require __DIR__ . "/config/app.php";
 
 $pdo = new PDO(
-    "mysql:host=127.0.0.1;dbname={$config['db']['name']}",
+    "mysql:host={$config['db']['host']};",
     $config['db']['user'],
     $config['db']['pass']
 );
 
 $tableName = 'history';
 
-$check = $pdo->query("SHOW TABLES LIKE '{$tableName}'");
+$pdo->exec("CREATE DATABASE IF NOT EXISTS {$config['db']['name']}");
+$pdo2  = new PDO(
+    "mysql:host={$config['db']['host']};dbname={$config['db']['name']}",
+    $config['db']['user'],
+    $config['db']['pass']
+);
 
-if ($check === false) {
-    die("Error checking table existence\n");
-}
+echo "Running migrations...\n";
 
-if ($check->rowCount() === 0) {
-    echo "Running migrations...\n";
-
-    $sql = "CREATE TABLE {$tableName} (
+$sql = "CREATE TABLE {$tableName} (
         id INT AUTO_INCREMENT PRIMARY KEY,
         lux FLOAT,
         temperature FLOAT,
@@ -30,8 +30,5 @@ if ($check->rowCount() === 0) {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
 
-    $pdo->exec($sql);
-    echo "Table {$tableName} created.\n";
-} else {
-    echo "Migration skipped. Table '{$tableName}' already exists.\n";
-}
+$pdo2->exec($sql);
+echo "Table {$tableName} created.\n";

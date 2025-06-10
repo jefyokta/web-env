@@ -35,33 +35,33 @@ function startServer($config)
 }
 
 
-if ($config['app']['dev']) {
-    $watcher = FFI::cdef(file_get_contents(__DIR__ . "/c/fileWatcher.h"), __DIR__ . "/libfileWatcher.so");
-    $watcher->watchDir(__DIR__ . "/app/");
-    $pidServer = pcntl_fork();
+// if ($config['app']['dev']) {
+//     $watcher = FFI::cdef(file_get_contents(__DIR__ . "/c/fileWatcher.h"), __DIR__ . "/libfileWatcher.so");
+//     $watcher->watchDir(__DIR__ . "/app/");
+//     $pidServer = pcntl_fork();
 
-    if ($pidServer == -1) {
-        die("Failed to fork\n");
-    } elseif ($pidServer == 0) {
-        startServer($config);
-        exit(0);
-    } else {
-        while (true) {
-            $changed = $watcher->waitForChanges(1000);
-            if ($changed > 0) {
-                echo "\033[33mFile changed, restarting server...\033[0m\n";
-                posix_kill($pidServer, SIGTERM);
-                pcntl_waitpid($pidServer, $status);
+//     if ($pidServer == -1) {
+//         die("Failed to fork\n");
+//     } elseif ($pidServer == 0) {
+//         startServer($config);
+//         exit(0);
+//     } else {
+//         while (true) {
+//             $changed = $watcher->waitForChanges(1000);
+//             if ($changed > 0) {
+//                 echo "\033[33mFile changed, restarting server...\033[0m\n";
+//                 posix_kill($pidServer, SIGTERM);
+//                 pcntl_waitpid($pidServer, $status);
 
-                $pidServer = pcntl_fork();
-                if ($pidServer == 0) {
-                    startServer($config);
-                    exit(0);
-                }
-            }
-            usleep(200_000);
-        }
-    }
-} else {
+//                 $pidServer = pcntl_fork();
+//                 if ($pidServer == 0) {
+//                     startServer($config);
+//                     exit(0);
+//                 }
+//             }
+//             usleep(200_000);
+//         }
+//     }
+// } else {
     startServer($config);
-}
+// }
